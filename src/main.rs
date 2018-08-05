@@ -18,7 +18,7 @@ impl Config {
         // Abort if not at least 2 arguments given,
         // first argument is always `target/debug/binary-name`
         if args.len() < 3 {
-            panic!("Not enough arguments.");
+            return Err("Not enough arguments.");
         }
 
         let query = args[1].clone();
