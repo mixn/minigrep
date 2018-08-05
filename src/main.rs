@@ -11,14 +11,15 @@ struct Config {
     filename: String
 }
 
-fn parse_config(args: &[String]) -> Config {
-    // Inefficient but easiest, since it avoids lifetimes
-    let query = args[1].clone();
-    let filename = args[2].clone();
+impl Config {
+    fn new(args: &[String]) -> Config {
+        let query = args[1].clone();
+        let filename = args[2].clone();
 
-    Config {
-        query,
-        filename
+        Config {
+            query,
+            filename
+        }
     }
 }
 
@@ -26,7 +27,7 @@ fn main() {
     // `collect` will turn an iterator into
     // a collection, in this case a Vector
     let args: Vec<String> = env::args().collect();
-    let config = parse_config(&args);
+    let config = Config::new(&args);
 
     println!("Searching for {} in {}", config.query, config.filename);
 
