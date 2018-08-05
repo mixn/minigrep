@@ -5,6 +5,7 @@ use std::fs::File;
 // In this case needed for `read_to_string`
 use std::io::prelude::*;
 use std::process;
+use std::error::Error;
 
 // Use a struct to better associate query 
 // with filename and be more explicit
@@ -29,6 +30,18 @@ impl Config {
     }
 }
 
+fn run(config: Config) -> Result<(), Box<Error>> {
+    // `?` instead of `expect`, as we don’t wanna panic right away
+    let mut f = File::open(config.filename)?;
+    let mut content = String::new();
+
+    f.read_to_string(&mut content).expect("Something went wrong reading the file.");
+
+    println!("{}", content);
+
+    Ok(())
+}
+
 fn main() {
     // `collect` will turn an iterator into
     // a collection, in this case a Vector
@@ -44,11 +57,10 @@ fn main() {
 
     println!("Searching for {} in {}…\n", config.query, config.filename);
 
-    // `expect` is needed/important, otherwise `read_to_string` will fail
-    let mut f = File::open(config.filename).expect("File not found.");
-    let mut content = String::new();
-
-    f.read_to_string(&mut content).expect("Something went wrong reading the file.");
-
-    println!("{}", content);
+    // Error-handling code, since `run` returns a `Result`
+    // We only care about the failing case, as success is just `()`
+    if let Err(e) = run(config) {
+        println!("Error: {}", e);
+        process::exit(1);
+    }
 }
