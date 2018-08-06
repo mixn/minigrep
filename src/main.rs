@@ -1,46 +1,8 @@
+extern crate minigrep;
+
 use std::env;
-// For handling files
-use std::fs::File;
-// Contains various useful traits for doing I/O, including file I/O
-// In this case needed for `read_to_string`
-use std::io::prelude::*;
 use std::process;
-use std::error::Error;
-
-// Use a struct to better associate query 
-// with filename and be more explicit
-struct Config {
-    query: String,
-    filename: String
-}
-
-impl Config {
-    fn new(args: &[String]) -> Result<Config, &'static str> {
-        // Abort if not at least 2 arguments given,
-        // first argument is always `target/debug/binary-name`
-        if args.len() < 3 {
-            return Err("Not enough arguments.");
-        }
-
-        let query = args[1].clone();
-        let filename = args[2].clone();
-
-        // “Resolve” with an instance of `Config`
-        Ok(Config { query, filename})
-    }
-}
-
-fn run(config: Config) -> Result<(), Box<Error>> {
-    // `?` instead of `expect`, as we don’t wanna panic right away
-    let mut f = File::open(config.filename)?;
-    let mut content = String::new();
-
-    f.read_to_string(&mut content).expect("Something went wrong reading the file.");
-
-    println!("{}", content);
-
-    Ok(())
-}
+use minigrep::Config;
 
 fn main() {
     // `collect` will turn an iterator into
@@ -59,7 +21,7 @@ fn main() {
 
     // Error-handling code, since `run` returns a `Result`
     // We only care about the failing case, as success is just `()`
-    if let Err(e) = run(config) {
+    if let Err(e) = minigrep::run(config) {
         println!("Error: {}", e);
         process::exit(1);
     }
