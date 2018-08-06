@@ -1,3 +1,19 @@
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn one_result() {
+        let query = "duct";
+        let content = "\
+Rust:
+safe, fast, productive.
+Pick three.";
+
+        assert_eq!(vec!["safe, fast, productive."], search(query, content));
+    }
+}
+
 // For handling files
 use std::fs::File;
 // Contains various useful traits for doing I/O, including file I/O
@@ -38,4 +54,22 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     println!("{}", content);
 
     Ok(())
+}
+
+// Needed lifetime 'a since lifetime of `content` is connected to
+// the lifetime of the return value. We indicate that the returned
+// vector should contain string slices that reference slices of
+// the argument `content` (rather than the argument `query`)
+// We tell Rust that the data returned by `search` will live as long
+// as the data passed into the `search` function in the `content` argument
+pub fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+
+    for line in content.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+
+    results
 }
