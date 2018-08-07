@@ -33,12 +33,14 @@ use std::fs::File;
 // In this case needed for `read_to_string`
 use std::io::prelude::*;
 use std::error::Error;
+use std::env;
 
 // Use a struct to better associate query 
 // with filename and be more explicit
 pub struct Config {
     pub query: String,
-    pub filename: String
+    pub filename: String,
+    pub case_sensitive: bool
 }
 
 impl Config {
@@ -51,9 +53,15 @@ impl Config {
 
         let query = args[1].clone();
         let filename = args[2].clone();
+        // Returns a Result that will be the successful `Ok` variant
+        // that contains the value of the environment variable if the environment variable is set
+        // Returns `Err` variant if the environment variable is not set
+        // `is_err` is used to whether it’s an error and therefore unset,
+        // we only care about set or unset, hence `is_err` over `unwrap` or `expect`
+        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
 
         // “Resolve” with an instance of `Config`
-        Ok(Config { query, filename})
+        Ok(Config { query, filename, case_sensitive })
     }
 }
 
@@ -64,7 +72,13 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 
     f.read_to_string(&mut content).expect("Something went wrong reading the file.");
 
-    for line in search(&config.query, &content) {
+    let results = if config.case_sensitive {
+        search(&config.query, &content)
+    } else {
+        search_case_insensitive(&config.query, &content)
+    };
+
+    for line in results {
         println!("{}", line);
     }
 
