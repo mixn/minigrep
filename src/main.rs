@@ -5,14 +5,10 @@ use std::process;
 use minigrep::Config;
 
 fn main() {
-    // `collect` will turn an iterator into
-    // a collection, in this case a Vector
-    let args: Vec<String> = env::args().collect();
-
     // `unwrap_or_else` will unwrap the value of `Ok`, if ok,
     // otherwise it will call the callback, accepting `err`
     // and exit the process
-    let config = Config::new(&args).unwrap_or_else(|err| {
+    let config = Config::new(env::args()).unwrap_or_else(|err| {
         eprintln!("Problem parsing arguments: {}", err);
         process::exit(1);
     });

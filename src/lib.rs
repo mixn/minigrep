@@ -44,15 +44,19 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
-        // Abort if not at least 2 arguments given,
-        // first argument is always `target/debug/binary-name`
-        if args.len() < 3 {
-            return Err("Not enough arguments.");
-        }
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+        args.next();
 
-        let query = args[1].clone();
-        let filename = args[2].clone();
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn’t get a query string")
+        };
+
+        let filename = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn’t get a file name")
+        };
+
         // Returns a Result that will be the successful `Ok` variant
         // that contains the value of the environment variable if the environment variable is set
         // Returns `Err` variant if the environment variable is not set
