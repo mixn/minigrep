@@ -96,15 +96,10 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 // We tell Rust that the data returned by `search` will live as long
 // as the data passed into the `search` function in the `content` argument
 pub fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
-    let mut results = Vec::new();
-
-    for line in content.lines() {
-        if line.contains(query) {
-            results.push(line);
-        }
-    }
-
-    results
+    content
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 pub fn search_case_insensitive<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
